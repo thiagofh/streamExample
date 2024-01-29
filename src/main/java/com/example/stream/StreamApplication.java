@@ -6,8 +6,10 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.util.StopWatch;
 
-import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 @SpringBootApplication
@@ -20,10 +22,13 @@ public class StreamApplication implements CommandLineRunner {
 
 	@Override
 	public void run(String... args) {
-		List<Integer> numeros = Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
+		//List<Integer> numeros = Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
 
+		List<Integer> numeros = IntStream.rangeClosed(1, 100)
+				.boxed().toList();
 		somaParalela(numeros.parallelStream());
 		execucaoSomaSequencial(numeros.stream());
+		forEachTest(numeros.stream());
 	}
 
 	private static void somaParalela(Stream<Integer> numeros) {
@@ -48,6 +53,16 @@ public class StreamApplication implements CommandLineRunner {
 
 		log.info("Soma Sequencial: {}", somaSequencial);
 		log.info("Tempo de Execução (Sequencial): {} ms", sequencialStopWatch.getTotalTimeMillis());
+	}
+
+	private static void forEachTest(Stream<Integer> numeros){
+		StopWatch forEachStopWatch = new StopWatch();
+		forEachStopWatch.start();
+		String result = numeros.map(Objects::toString)
+						.collect(Collectors.joining(","));
+		System.out.println(result);
+		forEachStopWatch.stop();
+		log.info("Tempo de Execução forEachOrdered: {} ms", forEachStopWatch.getTotalTimeMillis());
 	}
 
 }
